@@ -1,0 +1,21 @@
+{
+    "ips": [
+        "185.199.108.153"
+    ],
+    "urls": [
+        "http://phishing-example.com/login",
+        "https://secure-login-example.net/auth"
+    ],
+    "domains": [
+        "malicious-domain-example.com"
+    ],
+    "hashes": [
+        "44d88612fea8a8f36de82e1278abb02f",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "emails": [
+        "admin@example.com",
+        "security-alert@example.org"
+    ],
+    "unknown": []
+}
