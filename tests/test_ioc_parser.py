@@ -129,3 +129,13 @@ def test_raise_file_not_found_error() -> None:
         match="File not found: file-that-does-not-exist.txt",
     ):
         parse_iocs(missing_file)
+
+
+def test_invalid_ipv4_is_unknown(tmp_path: Path) -> None:
+    input_file = write_ioc_file(tmp_path, "999.999.999.999\n")
+
+    result = parse_iocs(str(input_file))
+
+    assert result["ips"] == []
+    assert result["unknown"] == ["999.999.999.999"]
+    

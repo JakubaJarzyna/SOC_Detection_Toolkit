@@ -1,12 +1,21 @@
+import ipaddress
 import re
 from pathlib import Path
 
 
-IP_PATTERN = re.compile(r"^(?:\d{1,3}\.){3}\d{1,3}$")
 URL_PATTERN = re.compile(r"^https?://[^\s]+$")
 EMAIL_PATTERN = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
 HASH_PATTERN = re.compile(r"^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$")
 DOMAIN_PATTERN = re.compile(r"^(?!https?://)(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$")
+
+
+def is_valid_ipv4(value: str) -> bool:
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError:
+        return False
+
+    return address.version == 4
 
 
 def parse_iocs(file_path: str) -> dict:
@@ -30,7 +39,7 @@ def parse_iocs(file_path: str) -> dict:
         if not value:
             continue
 
-        if IP_PATTERN.fullmatch(value):
+        if is_valid_ipv4(value):
             results["ips"].append(value)
         elif URL_PATTERN.fullmatch(value):
             results["urls"].append(value)
