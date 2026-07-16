@@ -49,10 +49,7 @@ def test_parse_email(tmp_path: Path) -> None:
     [
         "d41d8cd98f00b204e9800998ecf8427e",
         "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-        (
-            "e3b0c44298fc1c149afbf4c8996fb924"
-            "27ae41e4649b934ca495991b7852b855"
-        ),
+        ("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     ],
 )
 def test_parse_supported_hashes(tmp_path: Path, hash_value: str) -> None:
@@ -138,4 +135,3 @@ def test_invalid_ipv4_is_unknown(tmp_path: Path) -> None:
 
     assert result["ips"] == []
     assert result["unknown"] == ["999.999.999.999"]
-    

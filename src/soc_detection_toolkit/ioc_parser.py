@@ -2,7 +2,6 @@ import ipaddress
 import re
 from pathlib import Path
 
-
 URL_PATTERN = re.compile(r"^https?://[^\s]+$")
 EMAIL_PATTERN = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
 HASH_PATTERN = re.compile(r"^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$")
