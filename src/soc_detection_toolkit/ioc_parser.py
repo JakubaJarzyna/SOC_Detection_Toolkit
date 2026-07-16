@@ -2,6 +2,8 @@ import ipaddress
 import re
 from pathlib import Path
 
+from soc_detection_toolkit.models import IOCResults
+
 URL_PATTERN = re.compile(r"^https?://[^\s]+$")
 EMAIL_PATTERN = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
 HASH_PATTERN = re.compile(r"^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$")
@@ -17,8 +19,8 @@ def is_valid_ipv4(value: str) -> bool:
     return address.version == 4
 
 
-def parse_iocs(file_path: str) -> dict:
-    results = {
+def parse_iocs(file_path: str) -> IOCResults:
+    results: IOCResults = {
         "ips": [],
         "urls": [],
         "domains": [],
