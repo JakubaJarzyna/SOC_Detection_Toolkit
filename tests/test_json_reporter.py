@@ -1,12 +1,33 @@
 import json
 from pathlib import Path
 
-from soc_detection_toolkit.json_reporter import save_json_report
+from soc_detection_toolkit.json_reporter import build_report, save_json_report
 from soc_detection_toolkit.models import IOCResults
+
+
+def test_build_report_contains_metadata() -> None:
+    results: IOCResults = {
+        "ips": ["192.168.1.10"],
+        "urls": [],
+        "domains": ["example.com"],
+        "hashes": [],
+        "emails": [],
+        "unknown": [],
+    }
+
+    report = build_report(results, "data/iocs.txt")
+
+    assert report["metadata"]["source_file"] == "data/iocs.txt"
+    assert report["metadata"]["total_items"] == 2
+    assert report["metadata"]["counts"]["ips"] == 1
+    assert report["metadata"]["counts"]["domains"] == 1
+    assert report["indicators"] == results
+    assert report["metadata"]["generated_at"]
 
 
 def test_save_json_report(tmp_path: Path) -> None:
     output_file = tmp_path / "report.json"
+
     results: IOCResults = {
         "ips": ["192.168.1.10"],
         "urls": ["https://example.com"],
@@ -16,17 +37,19 @@ def test_save_json_report(tmp_path: Path) -> None:
         "unknown": [],
     }
 
-    save_json_report(results, str(output_file))
+    report = build_report(results, "data/iocs.txt")
+    save_json_report(report, str(output_file))
 
     assert output_file.exists()
 
-    saved_results = json.loads(output_file.read_text(encoding="utf-8"))
+    saved_report = json.loads(output_file.read_text(encoding="utf-8"))
 
-    assert saved_results == results
+    assert saved_report == report
 
 
 def test_create_parent_directories(tmp_path: Path) -> None:
     output_file = tmp_path / "nested" / "reports" / "report.json"
+
     results: IOCResults = {
         "ips": [],
         "urls": [],
@@ -36,7 +59,8 @@ def test_create_parent_directories(tmp_path: Path) -> None:
         "unknown": [],
     }
 
-    save_json_report(results, str(output_file))
+    report = build_report(results, "data/iocs.txt")
+    save_json_report(report, str(output_file))
 
     assert output_file.exists()
     assert output_file.parent.is_dir()
@@ -55,8 +79,9 @@ def test_overwrite_existing_report(tmp_path: Path) -> None:
         "unknown": [],
     }
 
-    save_json_report(results, str(output_file))
+    report = build_report(results, "data/iocs.txt")
+    save_json_report(report, str(output_file))
 
-    saved_results = json.loads(output_file.read_text(encoding="utf-8"))
+    saved_report = json.loads(output_file.read_text(encoding="utf-8"))
 
-    assert saved_results == results
+    assert saved_report == report

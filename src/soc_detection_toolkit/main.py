@@ -3,7 +3,7 @@ import sys
 from collections.abc import Sequence
 
 from soc_detection_toolkit.ioc_parser import parse_iocs
-from soc_detection_toolkit.json_reporter import save_json_report
+from soc_detection_toolkit.json_reporter import build_report, save_json_report
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -33,7 +33,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         results = parse_iocs(args.input)
-        save_json_report(results, args.output)
+        report = build_report(results, args.input)
+        save_json_report(report, args.output)
     except OSError as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
