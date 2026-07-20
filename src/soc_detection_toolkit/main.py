@@ -33,8 +33,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         results = parse_iocs(args.input)
+
+        if not any(results.values()):
+            print(
+                "Warning: no indicators were found in the input file.",
+                file=sys.stderr,
+            )
+
         report = build_report(results, args.input)
         save_json_report(report, args.output)
+
     except OSError as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1

@@ -1,9 +1,24 @@
 import json
 from pathlib import Path
 
-from soc_detection_toolkit.json_reporter import build_report, save_json_report
+from soc_detection_toolkit.json_reporter import (
+    build_report,
+    count_indicators,
+    save_json_report,
+)
 from soc_detection_toolkit.models import IOCResults
 
+def test_count_indicators() -> None:
+    results: IOCResults = {
+        "ips": ["192.168.1.10"],
+        "urls": ["https://example.com"],
+        "domains": ["example.org"],
+        "hashes": [],
+        "emails": ["soc@example.org"],
+        "unknown": ["invalid value"],
+    }
+
+    assert count_indicators(results) == 5
 
 def test_build_report_contains_metadata() -> None:
     results: IOCResults = {

@@ -94,3 +94,28 @@ def test_cli_requires_input_and_output_arguments(
     assert "the following arguments are required" in captured.err
     assert "--input" in captured.err
     assert "--output" in captured.err
+
+
+def test_cli_warns_when_input_file_is_empty(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    input_file = tmp_path / "empty.txt"
+    output_file = tmp_path / "report.json"
+
+    input_file.write_text("", encoding="utf-8")
+
+    exit_code = main(
+        [
+            "--input",
+            str(input_file),
+            "--output",
+            str(output_file),
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert output_file.exists()
+    assert "Warning: no indicators were found" in captured.err
