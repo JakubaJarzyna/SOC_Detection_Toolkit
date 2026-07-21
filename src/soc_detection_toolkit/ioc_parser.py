@@ -10,6 +10,17 @@ HASH_PATTERN = re.compile(r"^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}
 DOMAIN_PATTERN = re.compile(r"^(?!https?://)(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$")
 
 
+def deduplicate_results(results: IOCResults) -> IOCResults:
+    return {
+        "ips": list(dict.fromkeys(results["ips"])),
+        "urls": list(dict.fromkeys(results["urls"])),
+        "domains": list(dict.fromkeys(results["domains"])),
+        "hashes": list(dict.fromkeys(results["hashes"])),
+        "emails": list(dict.fromkeys(results["emails"])),
+        "unknown": list(dict.fromkeys(results["unknown"])),
+    }
+
+
 def is_valid_ipv4(value: str) -> bool:
     try:
         address = ipaddress.ip_address(value)

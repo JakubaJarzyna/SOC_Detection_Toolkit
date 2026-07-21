@@ -2,7 +2,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 
-from soc_detection_toolkit.ioc_parser import parse_iocs
+from soc_detection_toolkit.ioc_parser import deduplicate_results, parse_iocs
 from soc_detection_toolkit.json_reporter import build_report, save_json_report
 
 
@@ -24,6 +24,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path where the JSON report will be saved.",
     )
 
+    parser.add_argument(
+        "--deduplicate",
+        action="store_true",
+        help="Remove duplicate IOC values while preserving their original order.",
+    )
+
     return parser
 
 
@@ -33,6 +39,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         results = parse_iocs(args.input)
+
+        if args.deduplicate:
+            results = deduplicate_results(results)
 
         if not any(results.values()):
             print(

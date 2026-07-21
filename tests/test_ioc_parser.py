@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from soc_detection_toolkit.ioc_parser import parse_iocs
+from soc_detection_toolkit.ioc_parser import deduplicate_results, parse_iocs
+from soc_detection_toolkit.models import IOCResults
 
 
 def write_ioc_file(tmp_path: Path, content: str) -> Path:
@@ -135,3 +136,20 @@ def test_invalid_ipv4_is_unknown(tmp_path: Path) -> None:
 
     assert result["ips"] == []
     assert result["unknown"] == ["999.999.999.999"]
+
+
+def test_deduplicate_results_preserves_order() -> None:
+    results: IOCResults = {
+        "ips": ["192.168.1.10", "192.168.1.10", "10.0.0.1"],
+        "urls": ["https://example.com", "https://example.com"],
+        "domains": [],
+        "hashes": [],
+        "emails": [],
+        "unknown": ["invalid", "invalid"],
+    }
+
+    deduplicated = deduplicate_results(results)
+
+    assert deduplicated["ips"] == ["192.168.1.10", "10.0.0.1"]
+    assert deduplicated["urls"] == ["https://example.com"]
+    assert deduplicated["unknown"] == ["invalid"]

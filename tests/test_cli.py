@@ -75,6 +75,7 @@ def test_cli_help(
 
     captured = capsys.readouterr()
 
+    assert "--deduplicate" in captured.out
     assert error.value.code == 0
     assert "usage: soc-detection-toolkit" in captured.out
     assert "--input" in captured.out
@@ -119,3 +120,40 @@ def test_cli_warns_when_input_file_is_empty(
     assert exit_code == 0
     assert output_file.exists()
     assert "Warning: no indicators were found" in captured.err
+
+
+def test_cli_deduplicates_indicators_when_flag_is_used(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    input_file = tmp_path / "iocs.txt"
+    output_file = tmp_path / "report.json"
+
+    input_file.write_text(
+        "\n".join(
+            [
+                "192.168.1.10",
+                "192.168.1.10",
+                "example.com",
+                "example.com",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = main(
+        [
+            "--input",
+            str(input_file),
+            "--output",
+            str(output_file),
+            "--deduplicate",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "Detected IPs: 1" in captured.out
+    assert "Detected Domains: 1" in captured.out
+    assert captured.err == ""
