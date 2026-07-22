@@ -75,6 +75,7 @@ def test_cli_help(
 
     captured = capsys.readouterr()
 
+    assert "--format" in captured.out
     assert "--deduplicate" in captured.out
     assert error.value.code == 0
     assert "usage: soc-detection-toolkit" in captured.out
@@ -156,4 +157,39 @@ def test_cli_deduplicates_indicators_when_flag_is_used(
     assert exit_code == 0
     assert "Detected IPs: 1" in captured.out
     assert "Detected Domains: 1" in captured.out
+    assert captured.err == ""
+
+def test_cli_generates_csv_report(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    input_file = tmp_path / "iocs.txt"
+    output_file = tmp_path / "report.csv"
+
+    input_file.write_text(
+        "\n".join(
+            [
+                "192.168.1.10",
+                "example.com",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = main(
+        [
+            "--input",
+            str(input_file),
+            "--output",
+            str(output_file),
+            "--format",
+            "csv",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert output_file.exists()
+    assert "CSV report saved to:" in captured.out
     assert captured.err == ""

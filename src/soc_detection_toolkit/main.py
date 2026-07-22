@@ -2,6 +2,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 
+from soc_detection_toolkit.csv_reporter import save_csv_report
 from soc_detection_toolkit.ioc_parser import deduplicate_results, parse_iocs
 from soc_detection_toolkit.json_reporter import build_report, save_json_report
 
@@ -29,6 +30,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Remove duplicate IOC values while preserving their original order.",
     )
+    parser.add_argument(
+        "--format",
+        choices=("json", "csv"),
+        default="json",
+        help="Output report format. Default: json.",
+)
 
     return parser
 
@@ -49,8 +56,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 file=sys.stderr,
             )
 
-        report = build_report(results, args.input)
-        save_json_report(report, args.output)
+        if args.format == "csv":
+            save_csv_report(results, args.output)
+        else:
+            report = build_report(results, args.input)
+            save_json_report(report, args.output)
 
     except OSError as error:
         print(f"Error: {error}", file=sys.stderr)
@@ -64,7 +74,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"Detected Hashes: {len(results['hashes'])}")
     print(f"Detected Emails: {len(results['emails'])}")
     print(f"Unknown values: {len(results['unknown'])}")
-    print(f"\nJSON report saved to: {args.output}")
+    print(f"\n{args.format.upper()} report saved to: {args.output}")
 
     return 0
 
